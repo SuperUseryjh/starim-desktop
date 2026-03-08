@@ -2,20 +2,31 @@
   "name": "starim",
   "version": "1.0.0",
   "description": "StarIM Desktop Client",
-  "main": "main.js",
+  "main": "dist/main.js",
   "scripts": {
     "start": "electron .",
     "dev": "electron . --dev",
-    "build": "electron-builder",
-    "build:win": "electron-builder --win",
-    "build:mac": "electron-builder --mac",
-    "build:linux": "electron-builder --linux"
+    "build:main": "tsc -p tsconfig.main.json",
+    "build:renderer": "esbuild src/renderer/main.ts --bundle --outfile=dist/renderer/main.js --format=iife --platform=browser --target=chrome90",
+    "build:ts": "npm run build:main && npm run build:renderer",
+    "build": "npm run build:ts && electron-builder",
+    "build:win": "npm run build:ts && electron-builder --win",
+    "build:mac": "npm run build:ts && electron-builder --mac",
+    "build:linux": "npm run build:ts && electron-builder --linux",
+    "watch": "tsc -p tsconfig.main.json -w"
   },
   "devDependencies": {
+    "@types/node": "^20.0.0",
     "electron": "^37.2.0",
-    "electron-builder": "^26.0.0"
+    "electron-builder": "^26.0.0",
+    "esbuild": "^0.20.2",
+    "typescript": "^5.0.0"
   },
-  "keywords": ["chat", "im", "electron"],
+  "keywords": [
+    "chat",
+    "im",
+    "electron"
+  ],
   "author": "",
   "license": "MIT",
   "type": "commonjs",
@@ -23,11 +34,10 @@
     "appId": "com.starim.desktop",
     "productName": "StarIM",
     "directories": {
-      "output": "dist"
+      "output": "release"
     },
     "files": [
-      "main.js",
-      "preload.js",
+      "dist/**/*",
       "renderer/**/*",
       "assets/**/*"
     ],
@@ -35,14 +45,17 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "portable",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
-      ],
-      "icon": "assets/icon.ico"
+      ]
     },
     "nsis": {
       "oneClick": false,
@@ -52,12 +65,15 @@
       "shortcutName": "StarIM"
     },
     "mac": {
-      "target": ["dmg"],
-      "icon": "assets/icon.icns"
+      "target": [
+        "dmg"
+      ]
     },
     "linux": {
-      "target": ["AppImage", "deb"],
-      "icon": "assets/icon.png"
+      "target": [
+        "AppImage",
+        "deb"
+      ]
     }
   }
 }
